@@ -9,6 +9,8 @@ class SearchComponent extends Component {
   state = {
     searchInput: "",
     books: [],
+    validInput: true,
+    shelf: "none",
   };
   // updating books result for each change on the input field
   updateSearchResults = (result) => {
@@ -20,14 +22,20 @@ class SearchComponent extends Component {
       return;
     }
     BooksAPI.search(result)
-      .then((result) => {
-        if (result && result.length > 0)
-          this.setState(() => ({ books: result }));
+      .then((res) => {
+        if (res && res.length > 0) {
+          this.setState(() => ({
+            books: res,
+            validInput: true,
+          }));
+        } else this.setState({ books: [], validInput: false });
       })
-      .catch((e) => console.log(e));
+      .catch((e) => {
+        console.log(e);
+      });
   };
   render() {
-    const { searchInput, books } = this.state;
+    const { searchInput, books, validInput } = this.state;
     return (
       <>
         <div className="search-books">
@@ -50,15 +58,20 @@ class SearchComponent extends Component {
             </div>
           </div>
           <div className="search-books-results">
-            <ol className="books-grid">
-              {books.map((book) => (
-                <BookCard
-                  book={book}
-                  key={book.id}
-                  changeShelf={this.props.changeShelf}
-                />
-              ))}
-            </ol>
+            {validInput ? (
+              <ol className="books-grid">
+                {books.map((book) => (
+                  <BookCard
+                    book={book}
+                    booksOnShelves={this.props.booksOnShelves}
+                    key={book.id}
+                    changeShelf={this.props.changeShelf}
+                  />
+                ))}
+              </ol>
+            ) : (
+              <p>Books not found</p>
+            )}
           </div>
         </div>
       </>

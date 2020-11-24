@@ -7,14 +7,16 @@ class BookCard extends Component {
     shelf: "none",
   };
 
-  //refreshing books for every shelf on starting the app
+  //setting books shelves status on the search results
   componentDidMount = () => {
     if (!this.props.book.shelf) {
-      let bookOnShelf = this.props.book.shelf;
-
-      // console.log(
-      //   `this.props.book.shelf == ${this.props.book.shelf} and booksonShelf ${this.props.booksOnShelf}`
-      // );
+      // booksOnShelves comes from home component as following
+      //home on ( <SearchComponent booksOnShelves={this.state.books}/>)
+      // => then searchComponent on(<BookCard booksOnShelves={this.props.booksOnShelves} />)
+      // => back the wayto here so we can access it via this.props.booksOnShelves as following
+      let bookOnShelf = this.props.booksOnShelves.find(
+        (b) => b.id === this.props.book.id
+      );
       if (bookOnShelf) {
         this.setState({ shelf: bookOnShelf.shelf });
       }

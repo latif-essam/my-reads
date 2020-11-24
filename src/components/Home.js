@@ -28,7 +28,11 @@ class Home extends Component {
       books.unshift(book);
     }
     // filtering  books array to remove all books with unknown shelf
-    this.setState({ books: books.filter((b) => b.shelf !== "none") });
+    BooksAPI.update(book, shelf).then(() => {
+      this.setState({
+        books: books.filter((b) => b.shelf !== "none"),
+      });
+    });
   };
   render() {
     // getting books ready for the 3 shelfs we have by filtering them
@@ -39,7 +43,11 @@ class Home extends Component {
     );
     const wantToRead = books.filter((book) => book.shelf === "wantToRead");
     const read = books.filter((book) => book.shelf === "read");
-
+    const shelves = {
+      currentlyReading: ["Currently Reading", currentlyReading],
+      wantToRead: ["Want to Read", wantToRead],
+      read: ["Read", read],
+    };
     return (
       <Router>
         <>
@@ -51,24 +59,15 @@ class Home extends Component {
                 </div>
                 <div className="list-books-content">
                   <div>
-                    <div className="bookshelf">
-                      <h2 className="bookshelf-title">Currently Reading</h2>
-                      <BookShelf
-                        books={currentlyReading}
-                        changeShelf={this.changeShelf}
-                      />
-                    </div>
-                    <div className="bookshelf">
-                      <h2 className="bookshelf-title">Want to Read</h2>
-                      <BookShelf
-                        books={wantToRead}
-                        changeShelf={this.changeShelf}
-                      />
-                    </div>
-                    <div className="bookshelf">
-                      <h2 className="bookshelf-title">Read</h2>
-                      <BookShelf books={read} changeShelf={this.changeShelf} />
-                    </div>
+                    {Object.keys(shelves).map((shelf) => (
+                      <div key={shelves[shelf]} className="bookshelf">
+                        <h2 className="bookshelf-title">{shelves[shelf][0]}</h2>
+                        <BookShelf
+                          books={shelves[shelf][1]}
+                          changeShelf={this.changeShelf}
+                        />
+                      </div>
+                    ))}
                   </div>
                 </div>
                 <div className="open-search">
@@ -80,8 +79,7 @@ class Home extends Component {
             </Route>
             <Route path="/search">
               <SearchComponent
-                // sideNote  appling theses props here to search component took me 5 hrs of debuginng and rewriting components just to figure the errors  ;) feeling great after it works
-                booksOnShelf={this.state.books}
+                booksOnShelves={this.state.books}
                 changeShelf={this.changeShelf}
               />
             </Route>
